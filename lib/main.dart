@@ -40,22 +40,38 @@ class _AffirmationsAppState extends State<AffirmationsApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Update Data Example',
+      title: 'Affirmations',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.pink,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
+          backgroundColor: Colors.deepPurpleAccent,
           appBar: AppBar(
-            title: Text('Update Data Example'),
+            title: Text('Affirmations'),
+            centerTitle: true,
           ),
           body: Column(children: <Widget>[
             Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.lightBlueAccent,
+              ),
+              // width: 300,
+              height: 300,
+              padding: EdgeInsets.all(20.0),
+              margin: EdgeInsets.all(80.0),
               child: FutureBuilder<AffirmationsModel>(
                 future: _futureAffirmationsModel,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {
-                    return Text(snapshot.data.affirmation);
+                    return Text(snapshot.data.affirmation,
+                        textAlign: TextAlign.center,
+                        textScaleFactor: 1.4,
+                        style: TextStyle(color: Colors.white));
                   } else if (snapshot.hasError) {
                     return Text("${snapshot.error}");
                   }
@@ -66,12 +82,27 @@ class _AffirmationsAppState extends State<AffirmationsApp> {
             Divider(),
             Container(
               child: RaisedButton(
-                child: Text('Inspire me'),
                 onPressed: () {
                   setState(() {
                     _futureAffirmationsModel = fetchAffirmations();
                   });
                 },
+                textColor: Colors.white,
+                padding: const EdgeInsets.all(0.0),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: <Color>[
+                        Color(0xEEFF1461),
+                        Color(0xDDFF1483),
+                        Color(0xFFFF1493),
+                      ],
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(30.0),
+                  child:
+                  const Text('INSPIRE ME', style: TextStyle(fontSize: 15)),
+                ),
               ),
             )
           ])),
