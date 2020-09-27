@@ -19,7 +19,7 @@ void main() {
   runApp(AffirmationsApp());
 }
 
-class AffirmationsApp extends StatefulWidget{
+class AffirmationsApp extends StatefulWidget {
   AffirmationsApp({Key key}) : super(key: key);
 
   @override
@@ -45,42 +45,36 @@ class _AffirmationsAppState extends State<AffirmationsApp> {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Update Data Example'),
-        ),
-        body: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(8.0),
-          child: FutureBuilder<AffirmationsModel>(
-            future: _futureAffirmationsModel,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasData) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(snapshot.data.affirmation),
-                      RaisedButton(
-                        child: Text('Update Data'),
-                        onPressed: () {
-                          setState(() {
-                            _futureAffirmationsModel = fetchAffirmations();
-                          });
-                        },
-                      ),
-                    ],
-                  );
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-              }
-
-              return CircularProgressIndicator();
-            },
+          appBar: AppBar(
+            title: Text('Update Data Example'),
           ),
-        ),
-      ),
+          body: Column(children: <Widget>[
+            Container(
+              child: FutureBuilder<AffirmationsModel>(
+                future: _futureAffirmationsModel,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    return Text(snapshot.data.affirmation);
+                  } else if (snapshot.hasError) {
+                    return Text("${snapshot.error}");
+                  }
+                  return CircularProgressIndicator();
+                },
+              ),
+            ),
+            Divider(),
+            Container(
+              child: RaisedButton(
+                child: Text('Inspire me'),
+                onPressed: () {
+                  setState(() {
+                    _futureAffirmationsModel = fetchAffirmations();
+                  });
+                },
+              ),
+            )
+          ])),
     );
   }
-
 }
