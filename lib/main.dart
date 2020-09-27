@@ -5,60 +5,82 @@ import 'package:http/http.dart' as http;
 
 import 'AffirmationsModel.dart';
 
-void main() {
-  runApp(MyApp());
+Future<AffirmationsModel> fetchAffirmations() async {
+  final response = await http.get('https://www.affirmations.dev/');
+  if (response.statusCode == 200) {
+    final jsonAffirmations = jsonDecode(response.body);
+    return AffirmationsModel.fromJson(jsonAffirmations);
+  } else {
+    throw Exception('Failed');
+  }
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+void main() {
+  runApp(AffirmationsApp());
+}
+
+class AffirmationsApp extends StatefulWidget{
+  AffirmationsApp({Key key}) : super(key: key);
+
+  @override
+  _AffirmationsAppState createState() {
+    return _AffirmationsAppState();
+  }
+}
+
+class _AffirmationsAppState extends State<AffirmationsApp> {
+  Future<AffirmationsModel> _futureAffirmationsModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureAffirmationsModel = fetchAffirmations();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Affirmations',
+      title: 'Update Data Example',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: AffirmationsPage(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Update Data Example'),
+        ),
+        body: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(8.0),
+          child: FutureBuilder<AffirmationsModel>(
+            future: _futureAffirmationsModel,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(snapshot.data.affirmation),
+                      RaisedButton(
+                        child: Text('Update Data'),
+                        onPressed: () {
+                          setState(() {
+                            _futureAffirmationsModel = fetchAffirmations();
+                          });
+                        },
+                      ),
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+              }
+
+              return CircularProgressIndicator();
+            },
+          ),
+        ),
+      ),
     );
   }
-}
 
-class AffirmationsPage extends StatelessWidget{
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Affirmations'),
-        backgroundColor: Colors.deepPurpleAccent,
-        centerTitle: true,
-      ),
-      body: Center(
-        child: FutureBuilder<AffirmationsModel>(
-          future: getAffirmations(),
-          builder: (context, snapshot){
-            if (snapshot.hasData){
-              final result = snapshot.data;
-              return Text("${result.affirmation}");
-            }else if(snapshot.hasError){
-              return Text(snapshot.error.toString());
-            }
-            return CircularProgressIndicator();
-          },
-        )
-      )
-    );
-  }
-}
-
-
-Future <AffirmationsModel> getAffirmations() async{
-  final response = await http.get('https://www.affirmations.dev/');
-  if (response.statusCode==200){
-    final jsonAffirmations = jsonDecode(response.body);
-    return AffirmationsModel.fromJson(jsonAffirmations);
-  }
-  else{
-    throw Exception();
-  }
 }
