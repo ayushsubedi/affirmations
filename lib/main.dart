@@ -28,6 +28,11 @@ class AffirmationsPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Affirmations'),
+        backgroundColor: Colors.deepPurpleAccent,
+        centerTitle: true,
+      ),
       body: Center(
         child: FutureBuilder<AffirmationsModel>(
           future: getAffirmations(),
